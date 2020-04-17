@@ -14,6 +14,7 @@ from ray.tune import registry
 
 from ray.rllib.models import ModelCatalog
 from ray.rllib.models.tf.tf_modelv2 import TFModelV2
+from ray.rllib.models.preprocessors import Preprocessor
 
 """
 Helper functions
@@ -133,3 +134,40 @@ def load_models(local_dir="."):
         print("-    Successfully Loaded custom Model class {} from {}".format(
             class_name, os.path.basename(_file_path)
         ))
+
+
+def load_preprocessors(local_dir="."):
+    """
+    This function takes a path to a local directory
+    and looks for an `envs` folder, and imports
+    all the available files in there.
+    """
+    for _file_path in glob.glob(os.path.join(
+            local_dir, "preprocessors", "*.py")):
+        """
+        Determine the filename, preprocessor_name and class_name
+
+        # Convention :
+            - filename : snake_case
+            - classname : PascalCase
+
+            the class implementation, should be an inheritance
+            of the rllib class Preprocessor for it to used in rllib
+        """
+        preprocessor_name, class_name, _class = load_class_from_file(_file_path)
+        CustomPreprocessor = _class
+        # Validate the class
+        if not issubclass(CustomPreprocessor, Preprocessor):
+            raise Exception(
+                "We expected the class named {} to be "
+                "a subclass of Preprocessor. "
+                "Please read more here : <insert-link>"
+                .format(
+                    class_name
+                ))
+        # Finally Register Preprocessor in Tune
+        ModelCatalog.register_custom_preprocessor(preprocessor_name,
+                                                  CustomPreprocessor)
+        print("-    Successfully Loaded custom Preprocessor \
+                class {} from {}".format(class_name,
+              os.path.basename(_file_path)))
