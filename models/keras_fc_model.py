@@ -3,12 +3,12 @@ import tensorflow.compat.v2 as tf
 from ray.rllib.models.tf.misc import normc_initializer, get_activation_fn
 
 
-class MyKerasModel(TFModelV2):
+class KerasFcModel(TFModelV2):
     """Custom model for policy gradient algorithms."""
 
     def __init__(self, obs_space, action_space, num_outputs, model_config,
                  name):
-        super(MyKerasModel, self).__init__(obs_space, action_space,
+        super(KerasFcModel, self).__init__(obs_space, action_space,
                                            num_outputs, model_config, name)
         self.inputs = tf.keras.layers.Input(
             shape=obs_space.shape, name="observations")

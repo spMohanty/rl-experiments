@@ -5,7 +5,7 @@ rogi-rl-small-ppo:
         time_total_s: 150
     config:
         model:
-            custom_model: my_fancy_model # my_keras_model
+            custom_model: fc_net_model # keras_fc_model
             custom_preprocessor: obs_flatten_preprocessor
             vf_share_layers: True
             fcnet_activation: relu
