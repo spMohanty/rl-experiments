@@ -1,5 +1,5 @@
 from ray.rllib.models.tf.tf_modelv2 import TFModelV2
-import tensorflow as tf
+import tensorflow.compat.v2 as tf
 from ray.rllib.models.tf.misc import normc_initializer, get_activation_fn
 
 
