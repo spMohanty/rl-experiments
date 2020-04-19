@@ -10,14 +10,14 @@ rogi-rl-vision-ppo:
             conv_filters: [
                 [16, [4, 4], 2],
                 [32, [4, 4], 2],
-                [256, [11, 11], 1],
+                [256, [3, 3], 1],
             ]
         num_workers: 2
         num_sgd_iter: 1
         sgd_minibatch_size: 128
         env_config:
-            width: 42
-            height: 42
+            width: 10
+            height: 10
             population_density: 1.0
             vaccine_density: 0.66
             initial_infection_fraction: 0.045

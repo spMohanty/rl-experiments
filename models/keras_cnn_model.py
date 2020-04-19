@@ -7,7 +7,8 @@ tf = try_import_tf()
 
 class KerasCnnModel(TFModelV2):
 
-    def __init__(self, obs_space, action_space, num_outputs, model_config, name):
+    def __init__(self, obs_space, action_space, num_outputs,
+                 model_config, name):
         super(KerasCnnModel, self).__init__(
             obs_space, action_space, num_outputs, model_config, name)
         self.inputs = tf.keras.layers.Input(
@@ -41,17 +42,3 @@ class KerasCnnModel(TFModelV2):
 
     def value_function(self):
         return tf.reshape(self._value_out, [-1])
-
-# Nature CNN Architecture
-
-# super(KerasCnnModel, self).__init__(obs_space, action_space, num_outputs, model_config, name)
-# self.inputs = tf.keras.layers.Input(shape=obs_space.shape, name="observations")
-# conv1 = tf.keras.layers.Conv2D(filters=32, kernel_size=8, strides=4, activation='relu')(self.inputs)
-# conv2 = tf.keras.layers.Conv2D(filters=64, kernel_size=4, strides=2, activation='relu')(conv1)
-# conv3 = tf.keras.layers.Conv2D(filters=64, kernel_size=3, strides=1, activation='relu')(conv2)  # kernel_size=4 for nature cnn
-# conv_flatten = tf.keras.layers.Flatten()(conv3)
-# state = tf.keras.layers.Dense(512, activation='relu')(conv_flatten)
-# layer_out = tf.keras.layers.Dense(num_outputs, name="act_output")(state)
-# value_out = tf.keras.layers.Dense(1, name="value_output")(state)
-# self.base_model = tf.keras.Model(self.inputs, [layer_out, value_out])
-# self.register_variables(self.base_model.variables)
