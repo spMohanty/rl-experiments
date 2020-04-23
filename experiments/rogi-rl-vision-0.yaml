@@ -1,0 +1,40 @@
+rogi-rl-vision-ppo:
+    env: rogi_rl_small
+    run: PPO
+    stop:
+        time_total_s: 150
+    config:
+        model:
+            custom_model: keras_vision_model
+            conv_activation: relu
+            conv_filters: [
+                [16, [4, 4], 2],
+                [32, [4, 4], 2],
+                [256, [3, 3], 1],
+            ]
+        num_workers: 2
+        num_sgd_iter: 1
+        sgd_minibatch_size: 128
+        env_config:
+            width: 10
+            height: 10
+            population_density: 1.0
+            vaccine_density: 0.66
+            initial_infection_fraction: 0.045
+            initial_vaccination_fraction: 0.00
+            prob_infection: 0.05
+            prob_agent_movement: 0.0
+            disease_planner_config: 
+                latent_period_mu:   8 # 2 * 4
+                latent_period_sigma:   0
+                incubation_period_mu:   20 # 5 * 4
+                incubation_period_sigma:   0
+                recovery_period_mu:   56 # 14 * 4
+                recovery_period_sigma:   0
+            max_simulation_timesteps: 200
+            early_stopping_patience: 14
+            use_renderer: False
+            toric: False
+            debug: False
+
+
