@@ -1,0 +1,37 @@
+rogi-rl-mask-ppo:
+    env: rogi_rl_param_action
+    run: PPO
+    stop:
+        time_total_s: 1500
+    config:
+        model:
+            custom_model: param_action_model
+            vf_share_layers: True
+        num_workers: 1
+        eager: True,
+        log_level: INFO
+        # num_sgd_iter: 1
+        sgd_minibatch_size: 1
+        rollout_fragment_length: 1
+        train_batch_size: 1
+        env_config:
+            width: 5
+            height: 5
+            population_density: 1.0
+            vaccine_density: 0.66
+            initial_infection_fraction: 0.045
+            initial_vaccination_fraction: 0.00
+            prob_infection: 0.05
+            prob_agent_movement: 0.0
+            disease_planner_config: 
+                latent_period_mu:   8 # 2 * 4
+                latent_period_sigma:   0
+                incubation_period_mu:   20 # 5 * 4
+                incubation_period_sigma:   0
+                recovery_period_mu:   56 # 14 * 4
+                recovery_period_sigma:   0
+            max_simulation_timesteps: 200
+            early_stopping_patience: 14
+            use_renderer: False
+            toric: False
+            debug: False
