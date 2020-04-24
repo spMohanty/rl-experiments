@@ -34,12 +34,16 @@ class ParamActionModel(TFModelV2):
     def forward(self, input_dict, state, seq_lens):
         # Extract the available actions tensor from the observation.
         float_tf_type = tf.float32
+        int_tf_type = tf.int32
         action_mask = input_dict["obs"]["action_mask"]
 
         # Compute the predicted action embedding
         action_embed_orig, _ = self.action_embed_model({
             "obs": input_dict["obs"]["rogi"]
         })
+
+        # Standardise all tf types to tf.float32 to avoid issues
+        # in any tensorflow operations involving different types
         action_embed_orig = tf.cast(action_embed_orig, float_tf_type)
         action_mask = tf.cast(action_mask, float_tf_type)
 
@@ -48,27 +52,39 @@ class ParamActionModel(TFModelV2):
         width = action_dims[1]
 
         action_embed = tf.squeeze(action_embed_orig)
+
+        # action_mask_actual represents the final mask
+        # that will be added to our logits after taking log
         action_mask_actual = tf.constant([1.]*num_outputs,
                                          dtype=float_tf_type)
 
         action_mask = tf.squeeze(action_mask)
+
         n_action_types = len(ActionType)
         end_x = n_action_types + width
         action_type = tf.argmax(action_embed[:n_action_types], axis=-1)
         cell_x = tf.argmax(action_embed[n_action_types:end_x], axis=-1)
         cell_y = tf.argmax(action_embed[end_x:], axis=-1)
 
+        # get the value of susceptible observation for our x,y
         action_mask_value = action_mask[cell_x, cell_y]
 
+        # Start Index of the logits for x-coordinate
         cell_x_idx = tf.add(tf.constant([n_action_types],
                             dtype=cell_x.dtype), cell_x)
+
+        # Start Index of the logits for y-coordinate
         cell_y_idx = tf.add(tf.constant([end_x], dtype=cell_y.dtype), cell_y)
+
         vaccinate_idx = tf.constant([ActionType.VACCINATE.value],
                                     dtype=cell_x.dtype)
 
-        vaccinate_idx = tf.cast(vaccinate_idx, tf.int32)
-        cell_x_idx = tf.cast(cell_x_idx, tf.int32)
-        cell_y_idx = tf.cast(cell_y_idx, tf.int32)
+        # Cast all tensors to our tf int standard
+        vaccinate_idx = tf.cast(vaccinate_idx, int_tf_type)
+        cell_x_idx = tf.cast(cell_x_idx, int_tf_type)
+        cell_y_idx = tf.cast(cell_y_idx, int_tf_type)
+
+        # Update masks in the x,y and vaccinate indexes
         indices = tf.stack(values=[vaccinate_idx,
                                    cell_x_idx, cell_y_idx], axis=0)
         updates = tf.constant([1, 1, 1])
@@ -77,15 +93,18 @@ class ParamActionModel(TFModelV2):
 
         masker = tf.cast(masker, float_tf_type)
 
+        # Masked values in case of vaccinate
         action_mask_vaccinate = tf.cond(tf.equal(action_mask_value, 1),
                                         lambda: action_mask_actual,
                                         lambda: action_mask_actual - masker)
 
+        # Use vaccinate masked values only if action type is vaccinate
         action_mask_actual = tf.cond(tf.equal(action_type,
                                      ActionType.VACCINATE.value),
                                      lambda: action_mask_vaccinate,
                                      lambda: action_mask_actual)
 
+        # TODO: Placeholder for including action emebedings
         action_logits = action_embed_orig
 
         # Mask out invalid actions (use tf.float32.min for stability
