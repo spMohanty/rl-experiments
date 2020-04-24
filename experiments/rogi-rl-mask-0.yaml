@@ -8,7 +8,7 @@ rogi-rl-mask-ppo:
             custom_model: param_action_model
             vf_share_layers: True
         num_workers: 1
-        eager: True,
+        # eager: True,
         log_level: INFO
         # num_sgd_iter: 1
         sgd_minibatch_size: 1
