@@ -14,6 +14,9 @@ from ray.tune.tune import _make_scheduler, run_experiments
 from ray.rllib.utils.framework import try_import_tf, try_import_torch
 
 from utils.loader import load_envs, load_models, load_preprocessors
+from evaluation.evaluation_with_renderer import rogi_rl_eval_with_render
+from utils.custom_metrics import on_episode_start, on_episode_step, \
+                                 on_episode_end
 
 
 # Try to import both backends for flag checking/warnings.
@@ -133,6 +136,8 @@ def create_parser(parser_creator=None):
         type=str,
         help="If specified, use config options from this file. Note that this "
         "overrides any trial-specific options set via flags above.")
+    # Added to enable custom evaluation
+    parser.add_argument("--custom-eval", action="store_true")
     return parser
 
 
@@ -162,6 +167,11 @@ def run(args, parser):
 
     verbose = 1
     for exp in experiments.values():
+        exp['config']['callbacks'] = {
+            "on_episode_start": on_episode_start,
+            "on_episode_step": on_episode_step,
+            "on_episode_end": on_episode_end
+        }
         # Bazel makes it hard to find files specified in `args` (and `data`).
         # Look for them here.
         # NOTE: Some of our yaml files don't have a `config` section.
@@ -190,6 +200,8 @@ def run(args, parser):
             if not exp["config"].get("eager"):
                 raise ValueError("Must enable --eager to enable tracing.")
             exp["config"]["eager_tracing"] = True
+        if args.custom_eval:
+            exp["config"]["custom_eval_function"] = rogi_rl_eval_with_render
 
     if args.ray_num_nodes:
         cluster = Cluster()
