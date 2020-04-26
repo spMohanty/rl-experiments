@@ -1,4 +1,4 @@
-rogi-rl-vision-ppo:
+rogi-rl-cnn-ppo:
     env: rogi_rl_small
     run: PPO
     stop:
@@ -9,20 +9,18 @@ rogi-rl-vision-ppo:
     max_failures: 20
     config:
         model:
-            custom_model: keras_vision_model
+            custom_model: keras_cnn_model
             conv_activation: relu
-            conv_filters: [
-                [16, [4, 4], 2],
-                # [32, [4, 4], 2],
-                [256, [3, 3], 1],
-            ]
+            custom_options :
+                hidden_units: 128
+            fcnet_activation: relu
         num_workers: 0
         # num_gpus: 0.5
         num_sgd_iter: 1
         sgd_minibatch_size: 128
         env_config:
-            width: 5
-            height: 5
+            width: 16
+            height: 16
             population_density: 1.0
             vaccine_density: 0.66
             initial_infection_fraction: 0.045
@@ -53,8 +51,8 @@ rogi-rl-vision-ppo:
             explore: False
             env_config:
                 # Evaluate and save ascii/human render recording.
-                width: 5
-                height: 5
+                width: 16
+                height: 16
                 population_density: 1.0
                 vaccine_density: 0.66
                 initial_infection_fraction: 0.045
@@ -73,6 +71,5 @@ rogi-rl-vision-ppo:
                 use_renderer: ansi
                 toric: False
                 debug: False
-
 
 

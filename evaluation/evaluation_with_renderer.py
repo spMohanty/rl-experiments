@@ -27,7 +27,7 @@ def rogi_rl_eval_with_render(trainer, eval_workers):
     # Then we save recordings with both human and ascii renderer
     # Also remember to set `monitor: True`
     # Episodes can be set in yaml configs as `evaluation_num_episodes: 2`
-    worker_1.foreach_env.remote(lambda env: env.set_renderer("ascii"))
+    worker_1.foreach_env.remote(lambda env: env.set_renderer("ansi"))
     worker_2.foreach_env.remote(lambda env: env.set_renderer("human"))
 
     # If we are evaluating more than 2 episodes we need to increase range(1)
