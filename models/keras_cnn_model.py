@@ -13,18 +13,18 @@ class KerasCnnModel(TFModelV2):
             obs_space, action_space, num_outputs, model_config, name)
         self.inputs = tf.keras.layers.Input(
             shape=obs_space.shape, name="observations")
-        conv1 = tf.keras.layers.Conv2D(filters=6, kernel_size=3, strides=2,
+        conv1 = tf.keras.layers.Conv2D(filters=6, kernel_size=3, strides=1,
                                        activation=get_activation_fn(
                                            model_config.get("conv_activation")
-                                       ))(self.inputs)
-        conv2 = tf.keras.layers.Conv2D(filters=16, kernel_size=3, strides=2,
+                                       ), padding="same")(self.inputs)
+        conv2 = tf.keras.layers.Conv2D(filters=16, kernel_size=3, strides=1,
                                        activation=get_activation_fn(
                                            model_config.get("conv_activation")
-                                       ))(conv1)
+                                       ), padding="same")(conv1)
         conv3 = tf.keras.layers.Conv2D(filters=32, kernel_size=3, strides=1,
                                        activation=get_activation_fn(
                                            model_config.get("conv_activation")
-                                       ))(conv2)
+                                       ), padding="same")(conv2)
         conv_flatten = tf.keras.layers.Flatten()(conv3)
         state = tf.keras.layers.Dense(model_config['custom_options']
                                       ['hidden_units'],

@@ -19,8 +19,8 @@ rogi-rl-cnn-ppo:
         num_sgd_iter: 1
         sgd_minibatch_size: 128
         env_config:
-            width: 16
-            height: 16
+            width: 5
+            height: 5
             population_density: 1.0
             vaccine_density: 0.66
             initial_infection_fraction: 0.045
@@ -51,8 +51,8 @@ rogi-rl-cnn-ppo:
             explore: False
             env_config:
                 # Evaluate and save ascii/human render recording.
-                width: 16
-                height: 16
+                width: 5
+                height: 5
                 population_density: 1.0
                 vaccine_density: 0.66
                 initial_infection_fraction: 0.045
