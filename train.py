@@ -137,7 +137,11 @@ def create_parser(parser_creator=None):
         help="If specified, use config options from this file. Note that this "
         "overrides any trial-specific options set via flags above.")
     # Added to enable custom evaluation
-    parser.add_argument("--custom-eval", action="store_true")
+    parser.add_argument("--custom-eval", action="store_true", default=False,
+                        help="Whether to run our custom evaluation")
+    # Added to enable custom metrics
+    parser.add_argument("--log-stats", action="store_true", default=True,
+                        help="Whether to save custom metrics in callbacks.")
     return parser
 
 
@@ -167,11 +171,6 @@ def run(args, parser):
 
     verbose = 1
     for exp in experiments.values():
-        exp['config']['callbacks'] = {
-            "on_episode_start": on_episode_start,
-            "on_episode_step": on_episode_step,
-            "on_episode_end": on_episode_end
-        }
         # Bazel makes it hard to find files specified in `args` (and `data`).
         # Look for them here.
         # NOTE: Some of our yaml files don't have a `config` section.
@@ -202,6 +201,12 @@ def run(args, parser):
             exp["config"]["eager_tracing"] = True
         if args.custom_eval:
             exp["config"]["custom_eval_function"] = rogi_rl_eval_with_render
+        if args.log_stats:
+            exp['config']['callbacks'] = {
+                "on_episode_start": on_episode_start,
+                "on_episode_step": on_episode_step,
+                "on_episode_end": on_episode_end
+            }
 
     if args.ray_num_nodes:
         cluster = Cluster()
